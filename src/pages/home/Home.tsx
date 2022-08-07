@@ -1,5 +1,6 @@
 import { CircularProgress, Grid } from '@mui/material';
-import { useContext } from 'react';
+import { getAuth } from 'firebase/auth';
+import { useContext, useEffect } from 'react';
 import NewJobs from '../../components/NewJobs';
 import Overview from '../../components/Overview';
 import UpcomingSessions from '../../components/UpcomingSessions';

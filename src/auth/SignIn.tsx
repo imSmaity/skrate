@@ -1,8 +1,8 @@
 import { Button } from '@mui/material';
-import { getAuth, signInWithPopup } from 'firebase/auth';
+import { getAuth, signInWithPopup, signOut } from 'firebase/auth';
 import { useState } from 'react';
 import { useContext, useEffect } from 'react';
-import { SIGN_IN } from '../constants';
+import { SIGN_IN, SIGN_OUT } from '../constants';
 import { auth, provider } from '../Firebase';
 import { UserContext } from '../Start';
 
@@ -12,7 +12,6 @@ const SignIn = () => {
 	const signInWithGoogle = () => {
 		signInWithPopup(auth, provider)
 			.then((res) => {
-				console.log(res);
 				dispatch({ type: SIGN_IN, payload: res.user });
 			})
 			.then((err) => {
@@ -26,11 +25,19 @@ const SignIn = () => {
 			}
 		});
 	}, []);
-
+	const signout = () => {
+		const auth = getAuth();
+		signOut(auth)
+			.then(() => {
+				dispatch({ type: SIGN_OUT, payload: {} });
+			})
+			.catch((error) => {});
+	};
 	if (state)
 		return (
 			<Button
 				variant='contained'
+				onClick={signout}
 				sx={{
 					color: 'white',
 					boxShadow: 0,

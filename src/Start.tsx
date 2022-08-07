@@ -1,4 +1,4 @@
-import { Box, Grid } from '@mui/material';
+import { Box, Button, Grid } from '@mui/material';
 import { createContext, useEffect, useReducer, useState } from 'react';
 import Navbar from './components/Navbar';
 import Header from './components/Header';
@@ -8,6 +8,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/home/Home';
 import { Data } from './Type';
 import Shuffle from './pages/Shuffle/Shuffle';
+import { getAuth } from 'firebase/auth';
+import SignIn from './auth/SignIn';
 
 interface IContextProps {
 	state: object;
@@ -19,7 +21,7 @@ interface DataState {
 	data: Data | null;
 }
 const initialState = () => {
-	return {};
+	return { isLogin: false };
 };
 const Start = () => {
 	const [state, dispatch] = useReducer(reducer, initialState());
@@ -28,6 +30,7 @@ const Start = () => {
 		error: null,
 		data: null,
 	});
+	const [isLogin, setIsLogin] = useState<boolean>(false);
 	useEffect(() => {
 		axios
 			.get('https://mocki.io/v1/bb11aecd-ba61-44b9-9e2c-beabc442d818')
@@ -38,30 +41,43 @@ const Start = () => {
 				setData({ isLoading: false, error: err, data: null });
 			});
 	}, []);
+
+	useEffect(() => {
+		getAuth().onAuthStateChanged((user) => {
+			if (user) {
+				setIsLogin(true);
+			}
+		});
+	}, []);
+	if (isLogin)
+		return (
+			<BrowserRouter>
+				<UserContext.Provider value={{ state, dispatch }}>
+					<DataContext.Provider value={{ data, setData }}>
+						<Grid container>
+							<Grid item xs={12}>
+								<Header />
+							</Grid>
+							<Grid item xs={1}>
+								<Navbar />
+							</Grid>
+							<Grid item xs={11}>
+								<Routes>
+									<Route path='/home' element={<Home />} />
+
+									<Route path='/shuffle' element={<Shuffle />} />
+									<Route path='*' element={<div>404 Page Not Found!</div>} />
+								</Routes>
+							</Grid>
+						</Grid>
+					</DataContext.Provider>
+				</UserContext.Provider>
+			</BrowserRouter>
+		);
 	return (
-		<BrowserRouter>
-			<UserContext.Provider value={{ state, dispatch }}>
-				<DataContext.Provider value={{ data, setData }}>
-					<Grid container>
-						<Grid item xs={12}>
-							<Header />
-						</Grid>
-						<Grid item xs={1}>
-							<Navbar />
-						</Grid>
-						<Grid item xs={11}>
-							<Routes>
-								<Route path='/' element={<Home />} />
-
-								<Route path='/home' element={<Home />} />
-
-								<Route path='/shuffle' element={<Shuffle />} />
-							</Routes>
-						</Grid>
-					</Grid>
-				</DataContext.Provider>
-			</UserContext.Provider>
-		</BrowserRouter>
+		<Box>
+			<SignIn />
+		</Box>
 	);
 };
 
