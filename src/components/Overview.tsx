@@ -4,7 +4,7 @@ import { OverviewType } from '../Type';
 
 const Overview = ({ data }: { data: OverviewType | undefined }) => {
 	return (
-		<Box>
+		<Box sx={{ border: '1px solid gray', p: 5, m: 2 }}>
 			<Typography>Overview</Typography>
 			<Grid container>
 				<Grid item lg={6} sx={{ display: 'flex' }}>
