@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import Header from './components/Header';
 import reducer from './reducer';
 import axios from 'axios';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import Home from './pages/home/Home';
 import { Data } from './Type';
 import Shuffle from './pages/Shuffle/Shuffle';
@@ -12,7 +12,7 @@ import { getAuth } from 'firebase/auth';
 import SignIn from './auth/SignIn';
 
 interface IContextProps {
-	state: object;
+	state: any;
 	dispatch: ({ type }: { type: string; payload: object }) => void;
 }
 interface DataState {
@@ -23,6 +23,14 @@ interface DataState {
 const initialState = () => {
 	return { isLogin: false };
 };
+
+const Redirect = ({ to }: { to: string }) => {
+	const navigate = useNavigate();
+	useEffect(() => {
+		navigate(to);
+	}, [to]);
+	return null;
+};
 const Start = () => {
 	const [state, dispatch] = useReducer(reducer, initialState());
 	const [data, setData] = useState<DataState>({
@@ -30,6 +38,7 @@ const Start = () => {
 		error: null,
 		data: null,
 	});
+
 	const [isLogin, setIsLogin] = useState<boolean>(false);
 	useEffect(() => {
 		axios
@@ -42,14 +51,7 @@ const Start = () => {
 			});
 	}, []);
 
-	useEffect(() => {
-		getAuth().onAuthStateChanged((user) => {
-			if (user) {
-				setIsLogin(true);
-			}
-		});
-	}, []);
-	if (isLogin)
+	if (state.isLogin)
 		return (
 			<BrowserRouter>
 				<UserContext.Provider value={{ state, dispatch }}>
@@ -63,6 +65,7 @@ const Start = () => {
 							</Grid>
 							<Grid item xs={11}>
 								<Routes>
+									<Route path='/' element={<Redirect to='/home' />} />
 									<Route path='/home' element={<Home />} />
 
 									<Route path='/shuffle' element={<Shuffle />} />
@@ -75,9 +78,11 @@ const Start = () => {
 			</BrowserRouter>
 		);
 	return (
-		<Box>
-			<SignIn />
-		</Box>
+		<UserContext.Provider value={{ state, dispatch }}>
+			<Box>
+				<SignIn />
+			</Box>
+		</UserContext.Provider>
 	);
 };
 
