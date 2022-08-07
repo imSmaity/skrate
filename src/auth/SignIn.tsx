@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import { getAuth, signInWithPopup } from 'firebase/auth';
 import { useState } from 'react';
 import { useContext, useEffect } from 'react';
@@ -25,8 +26,28 @@ const SignIn = () => {
 			}
 		});
 	}, []);
-	console.log(state);
-	return <div onClick={signInWithGoogle}>Sign In</div>;
+
+	if (state)
+		return (
+			<Button
+				variant='contained'
+				sx={{
+					color: 'white',
+					boxShadow: 0,
+					backgroundColor: '#4F65F6',
+					textTransform: 'none',
+				}}>
+				Sign Out
+			</Button>
+		);
+	return (
+		<Button
+			variant='contained'
+			sx={{ color: 'white', backgroundColor: '#4F65F6', textTransform: 'none' }}
+			onClick={signInWithGoogle}>
+			Sign In
+		</Button>
+	);
 };
 
 export default SignIn;
